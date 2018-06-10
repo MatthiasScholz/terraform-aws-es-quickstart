@@ -2,10 +2,10 @@
 The following text is many extracted from the AWS documentation and reduced to the most interesting parts.
 
 ## Quick Info
-* Configured AWS ES domain name: "tf-demo-es-vpc-tf"
+* Configured AWS ES domain name: `tf-demo-es-vpc-tf`
 
 ## Network configuration - VPC
-- You control network access within your VPC using security 
+* You control network access within your VPC using security.
 
 Choose internet or VPC access. To enable VPC access, we will use private IP addresses from your VPC, which provides security by default. You control network access within your VPC using security groups.
 
@@ -29,9 +29,8 @@ To access the default installation of Kibana for a domain that resides within a 
 * managed network or 
 * using a proxy server.
 
--> https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-kibana.html#es-kibana-access
-
--> https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html#es-vpc-security
+* https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-kibana.html#es-kibana-access
+* https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html#es-vpc-security
 
 If you try to access the endpoint in a web browser, however, you might find that the request times out. To perform even basic GET requests, your computer must be able to connect to the VPC. This connection often takes the form of an 
 * internet gateway, 
@@ -54,7 +53,7 @@ When you create the domain, Amazon ES reserves the IP addresses. You can see the
 The Description column shows which Amazon ES domain the network interface is associated with.
 TIP: We recommend that you create dedicated subnets for the Amazon ES reserved IP addresses.
 
-Amazon ES requires a service-linked role to access your VPC. Amazon ES automatically creates the role when you use the Amazon ES console to create a domain within a VPC - you must have permissions for the iam:CreateServiceLinkedRole action. After Amazon ES creates the role, you can view it (AWSServiceRoleForAmazonElasticsearchService) using the IAM console.
+Amazon ES requires a service-linked role to access your VPC. Amazon ES automatically creates the role when you use the Amazon ES console to create a domain within a VPC - you must have permissions for the `iam:CreateServiceLinkedRole` action. After Amazon ES creates the role, you can view it (`AWSServiceRoleForAmazonElasticsearchService`) using the IAM console.
 
 * Access policy: template: „Do not require signing request with IAM credential“
 You can use security groups to control which IP addresses can access the domain.
@@ -65,7 +64,7 @@ Slow logs are an Elasticsearch feature that Amazon ES exposes through Amazon Clo
 3. On the Logs tab, choose Enable for the log that you want.
 4. Create a CloudWatch log group, or choose an existing one.
 NOTE: If you plan to enable search and index slow logs, we recommend publishing each to its own log group. This separation makes the logs easier to scan.
-1. Activate logging of ES: curl -XPUT elasticsearch_domain_endpoint/index/_settings --data '{"index.search.slowlog.threshold.query.warn": "5s","index.search.slowlog.threshold.query.info": "2s"}' -H 'Content-Type: application/json'
+1. Activate logging of ES: `curl -XPUT elasticsearch_domain_endpoint/index/_settings --data '{"index.search.slowlog.threshold.query.warn": "5s","index.search.slowlog.threshold.query.info": "2s"}' -H 'Content-Type: application/json'`
 NOTE: To test that slow logs are publishing successfully, consider starting with very low values to verify that logs appear in CloudWatch, and then increase the thresholds to more useful levels. -> https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html
 
 ## MONITORING
@@ -79,24 +78,26 @@ NOTE: To test that slow logs are publishing successfully, consider starting wit
     1. Instance in same subnet needed
     2. Extend SG of ES domain -> Explicitly open 443
     3. Connect SG of ES domain to Jump-Station
-    4. IAM-Role NOT needed
-2. SShuttle Configuration ~/.ssh/config
-    1. Host demoesvpc
-    2.   HostName <dns_name_of_the_jump_station>
-    3.   User ec2-user
-    4.   IdentitiesOnly yes
-    5.   IdentityFile <path_to_the_ssh_instance_key.pem>
+    4. Note: IAM-Role NOT needed
+2. SShuttle Configuration `~/.ssh/config`
+``` text
+Host demoesvpc
+  HostName <dns_name_of_the_jump_station>
+  User ec2-user
+  IdentitiesOnly yes
+  IdentityFile <path_to_the_ssh_instance_key.pem>
+```
 3. SSHuttle
     1. Examine subnet address to limit request forwarding. 
-    2. sshuttle --dns --pidfile=/tmp/sshuttle.pid --remote=demoesvpc <ip_range_to_forward_to_the_jump_station_recommended_only_VPC_range>
+    2. `sshuttle --dns --pidfile=/tmp/sshuttle.pid --remote=demoesvpc <ip_range_to_forward_to_the_jump_station_recommended_only_VPC_range>`
 4. Check: 
-    1. curl -k https://<aws_es_endpoint>
-    2. curl -XGET https://<aws_es_endpoint>/_cluster/health
+    1. `curl -k https://<aws_es_endpoint>`
+    2. `curl -XGET https://<aws_es_endpoint>/_cluster/health`
 
 ## PUSHING DATA
 
 Inside VPC - Connected to Jump-Station:
-* curl -XPUT https://<aws_es_endpoint>/tf-demo-es-vpc-tf/movie/1 -d '{"director": "Burton, Tim", "genre": ["Comedy","Sci-Fi"], "year": 1996, "actor": ["Jack Nicholson","Pierce Brosnan","Sarah Jessica Parker"], "title": "Mars Attacks!"}' -H 'Content-Type: application/json'
+* `curl -XPUT https://<aws_es_endpoint>/tf-demo-es-vpc-tf/movie/1 -d '{"director": "Burton, Tim", "genre": ["Comedy","Sci-Fi"], "year": 1996, "actor": ["Jack Nicholson","Pierce Brosnan","Sarah Jessica Parker"], "title": "Mars Attacks!"}' -H 'Content-Type: application/json'`
 
 
 ## SETUP AWS ES public - AWS Console
@@ -105,12 +106,12 @@ If you select public access, you should secure your domain with an access policy
 * https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-ac.html
 
 
-
-
 ## TERRAFORM
-Using a [terraform community module](https://github.com/terraform-community-modules/tf_aws_elasticsearch) to setup AWS ES. Check ´variables.tf´ and ´output.tf´ for further configuration remark.
+Using a [terraform community module](https://github.com/terraform-community-modules/tf_aws_elasticsearch) to setup AWS ES. Check `variables.tf` and `output.tf` for further configuration remark.
 
-1. ´terraform init´
-2. ´terraform plan -out es.out´
-3. ´terraform apply "es.out"
-4. ´terraform destroy´
+```bash
+terraform init
+terraform plan -out es.out -var-file es.tvars
+terraform apply "es.out"
+terraform destroy
+```
