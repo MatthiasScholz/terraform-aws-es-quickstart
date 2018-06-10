@@ -38,9 +38,9 @@ resource "aws_instance" "es_jump" {
   ami                         = "${var.jump_ami}"
   instance_type               = "t2.small"
   vpc_security_group_ids      = ["${aws_security_group.es_allow_all.id}"]
-  subnet_id                   = "${var.subnet_ids[0]}"
+  subnet_id                   = "${var.vpc_subnet_ids[0]}"
   associate_public_ip_address = true
-  key_name                    = "${var.ssh_key}"
+  key_name                    = "${var.instance_key}"
 
   tags {
     Name = "ES Jump Station"
@@ -55,7 +55,7 @@ module "es" {
   // Create ES inside a VPC
   vpc_options = {
     security_group_ids = ["${aws_security_group.es_allow_all.id}"]
-    subnet_ids         = "${var.subnet_ids}"
+    subnet_ids         = "${var.vpc_subnet_ids}"
   }
 
   es_version            = 6.2

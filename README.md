@@ -1,8 +1,12 @@
 # AWS Elastic Search Configuration
-## Network configuration - VPC:
-- You control network access within your VPC using security groups.
+The following text is many extracted from the AWS documentation and reduced to the most interesting parts.
 
-„““
+## Quick Info
+* Configured AWS ES domain name: "tf-demo-es-vpc-tf"
+
+## Network configuration - VPC
+- You control network access within your VPC using security 
+
 Choose internet or VPC access. To enable VPC access, we will use private IP addresses from your VPC, which provides security by default. You control network access within your VPC using security groups.
 
 Placing an Amazon ES domain within a VPC enables secure communication between Amazon ES and other services within the VPC without the need for an internet gateway, NAT device, or VPN connection.
@@ -13,7 +17,7 @@ To support VPCs, Amazon ES places an endpoint into either one or two subnets of 
 If you enable zone awareness for your domain, Amazon ES places an endpoint into two subnets.
 If you don't enable zone awareness, Amazon ES places an endpoint into only one subnet.
 
-Amazon ES assigns each ENI a private IP address from the IPv4 address range of your subnet.Amazon ES also places an elastic network interface (ENI) in the VPC for each of your data nodes.
+Amazon ES assigns each ENI a private IP address from the IPv4 address range of your subnet.Amazon ES also places an elastic network interface (ENI** in the VPC for each of your data nodes.
 
 The service also assigns a public DNS hostname.
 Because the IP addresses might change, you should resolve the domain endpoint periodically so that you can always access the correct data nodes. We recommend that you set the DNS resolution interval to one minute. 
@@ -24,8 +28,11 @@ To access the default installation of Kibana for a domain that resides within a 
 * to a VPN or 
 * managed network or 
 * using a proxy server.
+
 -> https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-kibana.html#es-kibana-access
+
 -> https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html#es-vpc-security
+
 If you try to access the endpoint in a web browser, however, you might find that the request times out. To perform even basic GET requests, your computer must be able to connect to the VPC. This connection often takes the form of an 
 * internet gateway, 
 * VPN server, or 
@@ -38,8 +45,8 @@ For an additional layer of security, we recommend using access policies that spe
 Because security groups already enforce IP-based access policies, you can't apply IP-based access policies to Amazon ES domains that reside within a VPC.
 
 ## SETUP AWS ES VPC - AWS Console
-- VPC-ID needed
-- Reserve IPs
+* VPC-ID needed
+* Reserve IPs
 The number of IP addresses that Amazon ES requires depends on the following:
 * Number of data nodes in your domain. (Master nodes are not included in the number.)
 * Whether you enable zone awareness. If you enable zone awareness, you need only half the number of IP addresses per subnet that you need if you don't enable zone awareness.
@@ -49,7 +56,7 @@ TIP: We recommend that you create dedicated subnets for the Amazon ES reserved I
 
 Amazon ES requires a service-linked role to access your VPC. Amazon ES automatically creates the role when you use the Amazon ES console to create a domain within a VPC - you must have permissions for the iam:CreateServiceLinkedRole action. After Amazon ES creates the role, you can view it (AWSServiceRoleForAmazonElasticsearchService) using the IAM console.
 
-- Access policy: template: „Do not require signing request with IAM credential“
+* Access policy: template: „Do not require signing request with IAM credential“
 You can use security groups to control which IP addresses can access the domain.
 
 Slow logs are an Elasticsearch feature that Amazon ES exposes through Amazon CloudWatch Logs. These logs are useful for troubleshooting performance issues, but are disabled by default. Elasticsearch disables slow logs by default. After you enable the publishing of slow logs to CloudWatch, you still must specify logging thresholds for each Elasticsearch index.
@@ -62,42 +69,40 @@ NOTE: If you plan to enable search and index slow logs, we recommend publishin
 NOTE: To test that slow logs are publishing successfully, consider starting with very low values to verify that logs appear in CloudWatch, and then increase the thresholds to more useful levels. -> https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-createupdatedomains.html
 
 ## MONITORING
--> https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains.html
+* https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-managedomains.html
 
 ## ACCESS KIBANA
--> http://blog.timmybankers.nl/2014/03/24/Poor-man's-VPN
--> https://www.jeremydaly.com/access-aws-vpc-based-elasticsearch-cluster-locally/#comment-2909
+* http://blog.timmybankers.nl/2014/03/24/Poor-man's-VPN
+* https://www.jeremydaly.com/access-aws-vpc-based-elasticsearch-cluster-locally/#comment-2909
 
-1. Configure Jump-Station: 
+1. Configure Jump-Station:
     1. Instance in same subnet needed
     2. Extend SG of ES domain -> Explicitly open 443
     3. Connect SG of ES domain to Jump-Station
     4. IAM-Role NOT needed
 2. SShuttle Configuration ~/.ssh/config
     1. Host demoesvpc
-    2.   HostName ec2-52-205-239-15.compute-1.amazonaws.com
+    2.   HostName <dns_name_of_the_jump_station>
     3.   User ec2-user
     4.   IdentitiesOnly yes
-    5.   IdentityFile /Users/mat/Documents/Projekte/devops/aws/playground/kp-us-east-1-playground-instancekey.pem
+    5.   IdentityFile <path_to_the_ssh_instance_key.pem>
 3. SSHuttle
     1. Examine subnet address to limit request forwarding. 
-    2. sshuttle --dns --pidfile=/tmp/sshuttle.pid --remote=demoesvpc 172.31.0.0/16 
+    2. sshuttle --dns --pidfile=/tmp/sshuttle.pid --remote=demoesvpc <ip_range_to_forward_to_the_jump_station_recommended_only_VPC_range>
 4. Check: 
-    1. curl -k https://vpc-demo-es-vpc-46bui5ggqnfgo2kigv3buuqe5i.us-east-1.es.amazonaws.com
-    2. curl -XGET https://vpc-demo-es-vpc-46bui5ggqnfgo2kigv3buuqe5i.us-east-1.es.amazonaws.com/_cluster/health
+    1. curl -k https://<aws_es_endpoint>
+    2. curl -XGET https://<aws_es_endpoint>/_cluster/health
 
 ## PUSHING DATA
 
 Inside VPC - Connected to Jump-Station:
-* curl -XPUT https://vpc-demo-es-vpc-46bui5ggqnfgo2kigv3buuqe5i.us-east-1.es.amazonaws.com/demo-es-vpc/movie/1 -d '{"director": "Burton, Tim", "genre": ["Comedy","Sci-Fi"], "year": 1996, "actor": ["Jack Nicholson","Pierce Brosnan","Sarah Jessica Parker"], "title": "Mars Attacks!"}' -H 'Content-Type: application/json'
+* curl -XPUT https://<aws_es_endpoint>/tf-demo-es-vpc-tf/movie/1 -d '{"director": "Burton, Tim", "genre": ["Comedy","Sci-Fi"], "year": 1996, "actor": ["Jack Nicholson","Pierce Brosnan","Sarah Jessica Parker"], "title": "Mars Attacks!"}' -H 'Content-Type: application/json'
 
 
 ## SETUP AWS ES public - AWS Console
 If you select public access, you should secure your domain with an access policy that only allows specific users or IP addresses to access the domain.
-„““
-
--> https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html
--> https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-ac.html
+* https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-vpc.html
+* https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-ac.html
 
 
 

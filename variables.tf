@@ -10,12 +10,13 @@ variable "region" {
 
 variable "vpc_id" {
   description = "VPC"
-  default     = "vpc-bf440ad9" // default vpc
 }
 
-variable "subnet_ids" {
+// NOTE: This variable has to be configured.
+//       The default parameter is only used to tell terraform which type to expect.
+variable "vpc_subnet_ids" {
   description = "Subnets the ES cluster should be created in."
-  default     = ["subnet-bf8ee983"]
+  default     = []
 }
 
 variable "instance_type" {
@@ -28,7 +29,6 @@ variable "jump_ami" {
   default     = "ami-afd15ed0"                    // Amazon Linux 2 LTS ( amzn2-ami-hvm-2017.12.0.20180509-x86_64-gp2 )
 }
 
-variable "ssh_key" {
+variable "instance_key" {
   description = "Name of the ssh key to access the jump instance."
-  default     = "kp-us-east-1-playground-instancekey.pem"
 }

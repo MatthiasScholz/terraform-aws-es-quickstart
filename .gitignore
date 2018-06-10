@@ -2,3 +2,4 @@
 *.out
 *.tfstate
 *.backup
+*.tfvars
