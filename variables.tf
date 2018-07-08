@@ -8,6 +8,11 @@ variable "region" {
   default     = "us-east-1"
 }
 
+variable "domain_name" {
+  description = "Name of the AWS ES cluster"
+  default     = "demo-es-vpc-tf"
+}
+
 variable "vpc_id" {
   description = "VPC"
 }

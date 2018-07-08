@@ -3,6 +3,11 @@ output "arn" {
   value       = "${module.es.arn}"
 }
 
+output "domain_name" {
+  description = "Name of the AWS ES cluster"
+  value       = "${var.domain_name}"
+}
+
 output "domain_id" {
   description = "Unique identifier for the domain"
   value       = "${module.es.domain_id}"

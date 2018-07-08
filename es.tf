@@ -50,7 +50,7 @@ resource "aws_instance" "es_jump" {
 // Configure terraform community module for AWS ES
 module "es" {
   source      = "github.com/terraform-community-modules/tf_aws_elasticsearch?ref=v0.1.0"
-  domain_name = "demo-es-vpc-tf"
+  domain_name = "${var.domain_name}"
 
   // Create ES inside a VPC
   vpc_options = {
