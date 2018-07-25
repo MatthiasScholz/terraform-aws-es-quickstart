@@ -1,9 +1,3 @@
-// Configure AWS access
-provider "aws" {
-  profile = "${var.profile}"
-  region  = "${var.region}"
-}
-
 // Create Security Group to handle access to AWS ES
 resource "aws_security_group" "es_allow_all" {
   name        = "allow_all"
@@ -35,6 +29,7 @@ resource "aws_security_group" "es_allow_all" {
 
 // Configuration for JumpStation to access ES and Kibana
 resource "aws_instance" "es_jump" {
+  count                       = "${length(var.jump_ami) > 0 ? 1 : 0}"
   ami                         = "${var.jump_ami}"
   instance_type               = "t2.small"
   vpc_security_group_ids      = ["${aws_security_group.es_allow_all.id}"]

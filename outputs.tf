@@ -25,5 +25,5 @@ output "securitygroup" {
 
 output "jump_dnsname" {
   description = "DNS name of the generated jump instances"
-  value       = "${aws_instance.es_jump.public_dns}"
+  value       = "${aws_instance.es_jump.*.public_dns}"
 }
