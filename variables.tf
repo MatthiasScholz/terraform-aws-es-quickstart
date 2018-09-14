@@ -41,3 +41,8 @@ variable "instance_key" {
   description = "Name of the ssh key to access the jump instance."
   default     = ""
 }
+
+variable "ebs_volume_size" {
+  description = "Size of the volume for the cluster instances in GB."
+  default     = "10"
+}
