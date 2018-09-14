@@ -58,5 +58,5 @@ module "es" {
   instance_type         = "${var.instance_type}"
   dedicated_master_type = "${var.instance_type}"
   es_zone_awareness     = false
-  ebs_volume_size       = 10
+  ebs_volume_size       = "${var.ebs_volume_size}"
 }
