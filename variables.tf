@@ -46,3 +46,8 @@ variable "ebs_volume_size" {
   description = "Size of the volume for the cluster instances in GB."
   default     = "10"
 }
+
+variable "instance_count" {
+  description = "Number of instances in the cluster."
+  default     = 1
+}

@@ -54,7 +54,7 @@ module "es" {
   }
 
   es_version            = 6.2
-  instance_count        = 1
+  instance_count        = "${var.instance_count}"
   instance_type         = "${var.instance_type}"
   dedicated_master_type = "${var.instance_type}"
   es_zone_awareness     = false
