@@ -53,7 +53,7 @@ module "es" {
     subnet_ids         = "${var.vpc_subnet_ids}"
   }
 
-  es_version            = 6.2
+  es_version            = "${var.es_version}"
   instance_count        = "${var.instance_count}"
   instance_type         = "${var.instance_type}"
   dedicated_master_type = "${var.instance_type}"

@@ -51,3 +51,8 @@ variable "instance_count" {
   description = "Number of instances in the cluster."
   default     = 1
 }
+
+variable "es_version" {
+  description = "The elastic search version to be used."
+  default     = 6.3
+}
